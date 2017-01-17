@@ -9,8 +9,8 @@
 
 
   <div class="keys">
-    <div data-key="65" class="key">
-      <kbd>A</kbd>
+    <div data-key="81" class="key">
+      <kbd>Q</kbd>
       <span class="sound">clap</span>
     </div>
     <div data-key="83" class="key">
@@ -47,7 +47,7 @@
     </div>
   </div>
 
-  <audio data-key="65" src="sounds/clap.wav"></audio>
+  <audio data-key="81" src="sounds/clap.wav"></audio>
   <audio data-key="83" src="sounds/hihat.wav"></audio>
   <audio data-key="68" src="sounds/kick.wav"></audio>
   <audio data-key="70" src="sounds/openhat.wav"></audio>
@@ -58,7 +58,49 @@
   <audio data-key="76" src="sounds/tink.wav"></audio>
 
 <script>
+  function playSound(e) {
+    // this will print the event.
+    // console.log(e);
+    // this will print the code of the key pressed
+    // console.log(e.keyCode);
 
+    // this will be the idea:
+    // const audio = document.querySelector('audio[data-key="81"]');
+    // with backtick can i put a variable. ES6 templates
+    const audio = document.querySelector(`audio[data-key="${e.keyCode}"]`);
+    // console.log(audio);
+
+    // to animate de divs
+    const key = document.querySelector(`.key[data-key="${e.keyCode}"]`);
+
+    if (!audio) return; // stop the function from running all together
+    audio.currentTime = 0; // rewind to the start
+    audio.play();
+
+    // we will add this class to the square with the key
+    key.classList.add('playing');
+    // on transitionEnd...
+  }
+
+  function removeTransition(e) {
+    // this will show all the transitions happening/ending
+    // console.log(e);
+    // we will just care of one of these transitions
+    if (e.propertyName !== 'transform') return; // skip it if it's not a transform
+    // console.log(e.propertyName); // if we put the transition on css to last 2 seconds.. this will trigger after 2 seconds
+
+    // this will be the key.addEventListener > so the .key
+    this.classList.remove('playing');
+
+  }
+
+  const keys = document.querySelectorAll('.key');
+  // we could not (in js) do: `keys.addEventListener('transitionend');`
+  // we must run on every element of the Node List // not an array of elements
+  // we should attach the event listening event on each element
+  // => arrow function > es6
+  keys.forEach(key => key.addEventListener('transitionend', removeTransition));
+  window.addEventListener('keydown', playSound);
 </script>
 
 

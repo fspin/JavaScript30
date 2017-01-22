@@ -1,18 +1,20 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Scoped CSS Variables and JS</title>
 </head>
 <body>
-  <h2>Update CSS Variables with <span class='hl'>JS</span></h2>
+  <h2 style="--base: #bada55;">Update CSS Variables with <span class='hl'>JS</span></h2>
 
   <div class="controls">
     <label for="spacing">Spacing:</label>
+    <!-- <input id="spacing" type="range" name="spacing" min="10" max="200" value="10" data-sizing="px" data-cool="more" data-me="fabian"> -->
     <input id="spacing" type="range" name="spacing" min="10" max="200" value="10" data-sizing="px">
 
     <label for="blur">Blur:</label>
     <input id="blur" type="range" name="blur" min="0" max="25" value="10" data-sizing="px">
+
 
     <label for="base">Base Color</label>
     <input id="base" type="color" name="base" value="#ffc600">
@@ -21,6 +23,21 @@
   <img src="https://source.unsplash.com/7bwQXzbF6KE/800x500">
 
   <style>
+  :root {
+    --base: #ffc600;
+    --spacing: 10px;
+    --blur: 10px;
+  }
+
+  img {
+    padding: var(--spacing);
+    background: var(--base);
+    filter: blur(var(--blur));
+  }
+
+  .hl {
+    color: var(--base);
+  }
 
     /*
       misc styles, nothing to do with CSS variables
@@ -48,6 +65,51 @@
   </style>
 
   <script>
+      const inputs = document.querySelectorAll('.controls input');
+      // This will give us a NodeList ! not an array
+      // console.log(inputs);
+      // we can see the methods declared in the _proto_ (prototype):
+      // a.o. entries(), forEach(), item(), keys(), length(), values()
+      // if we test an array i.e. var x = [1,2,3,4]
+      // an array have way more methods (map, toString, join, sort, push, filter, etc.)
+      // now we'll be ok with a NodeList
+
+      // testing with specific --base
+      const h2 = document.querySelector('h2');
+
+      function handleUpdate() {
+        // with this we see the value of the input moved
+        // console.log(this.value);
+
+        // a dataset is an object that will containt all the data attributes of an element
+        // console.log(this.dataset);
+        const suffix = this.dataset.sizing || '';
+        // or empty string, 'cause color doesn't have one, and otherwise i will get
+        // an undefined, which will broke everything
+        // console.log(suffix);
+
+        // this will give us the name of our variables (because are declared in
+        // the html element)
+        // console.log(this.name);
+
+        // document.documentElement.style.setPropery(`--base`);
+        // this is pointing to the :root --base
+        document.documentElement.style.setProperty(`--${this.name}`, this.value + suffix);
+
+        // if i declare h2's own --base variable (as i've done in this doc)
+        // i should point this explicitly, because it keep preponderance
+        // as in classic css...
+        h2.style.setProperty(`--${this.name}`, this.value + suffix);
+      }
+
+      // on change will only make effect when it's stopped changing
+      inputs.forEach(input => input.addEventListener('change', handleUpdate));
+      // on mousemove will apply every time the mouse is moved in/over
+      // this has differents behaviours in chrome and in firefox
+      // chrome will change the color automaticly // firefox will wait until the
+      // color picker close itself... (note in color changes)
+      inputs.forEach(input => input.addEventListener('mousemove', handleUpdate));
+
   </script>
 
 </body>
